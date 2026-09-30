@@ -7,20 +7,32 @@ st.set_page_config(page_title="Social Trend & Sentiment Analysis", page_icon="�
 st.title("📈 Social Media Trend & Sentiment Dashboard")
 st.caption("Monitoraggio del sentiment tramite VADER, LLM (Gemini) e Feed RSS.")
 
-# --- Sidebar ---
-st.sidebar.header("⚙️ Configurazione")
-rss_url = st.sidebar.text_input(
-    "URL Feed RSS News/Social", 
-    value="https://news.google.com/rss/search?q=technology&hl=it&gl=IT&ceid=IT:it"
-)
-
-engine = st.sidebar.selectbox("Motore Analisi Sentiment", ["vader", "gemini"])
-gemini_key = None
-if engine == "gemini":
-    gemini_key = st.sidebar.text_input("Gemini API Key", type="password")
-
-if st.sidebar.button("Aggiorna Dati"):
-    st.rerun()
+# --- PARAMETRI IN BASE ALLA FONTE SELEZIONATA ---
+if source_type == "Reddit API":
+    st.sidebar.subheader("Credenziali Reddit")
+    topic = st.sidebar.text_input("Argomento / Hashtag da tracciare", value="Technology")
+    client_id = st.sidebar.text_input("Reddit Client ID", type="password")
+    client_secret = st.sidebar.text_input("Reddit Client Secret", type="password")
+else:
+    st.sidebar.subheader("Seleziona Feed RSS")
+    
+    # Dizionario delle fonti predefinite
+    rss_options = {
+        "La Gazzetta del Mezzogiorno": "https://feeds.feedburner.com/lagazzettadelmezzogiorno/viyi6z8dkwu",
+        "La Gazzetta dello Sport - Calcio": "https://www.gazzetta.it/dynamic-feed/rss/section/Calcio.xml",
+        "Google News Technology": "https://news.google.com/rss/search?q=technology&hl=it&gl=IT&ceid=IT:it",
+        "URL Personalizzato": "custom"
+    }
+    
+    selected_feed_label = st.sidebar.selectbox(
+        "Scegli una fonte RSS predefinita:",
+        list(rss_options.keys())
+    )
+    
+    if rss_options[selected_feed_label] == "custom":
+        rss_url = st.sidebar.text_input("Inserisci URL Feed RSS personalizzato:")
+    else:
+        rss_url = rss_options[selected_feed_label]
 
 # --- Load Data ---
 with st.spinner("Estrazione dati e calcolo sentiment in corso..."):
