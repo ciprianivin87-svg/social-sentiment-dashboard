@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  sentiment-dashboard:
+    build: .
+    container_name: social_sentiment_app
+    ports:
+      - "8501:8501"
+    restart: unless-stopped
